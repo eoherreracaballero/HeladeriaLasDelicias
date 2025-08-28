@@ -1,0 +1,115 @@
+Contenido de $_POST: Array
+(
+    [no_identificacion] => 1023861067
+    [contrasena] => abc.123
+)
+
+Método de solicitud: POST
+Conexión a la base de datos exitosa
+Identificación: '1023861067', Contraseña: 'abc.123'
+Usuario encontrado: Sí
+Autenticación exitosa. Perfil: Administrador
+Sesión iniciada: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Redirigiendo a perfiles/administrador/inicio_admin.php
+Solicitud inválida: Se esperaba POST, recibido GET
+Contenido de $_POST: Array
+(
+    [no_identificacion] => 1023861067
+    [contrasena] => abc.123
+)
+
+Método de solicitud: POST
+Conexión a la base de datos exitosa
+Identificación: '1023861067', Contraseña: 'abc.123'
+Usuario encontrado: Sí
+Autenticación exitosa. Perfil: Administrador
+Sesión iniciada: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Redirigiendo a perfiles/administrador/inicio_admin.php
+Contenido de $_POST: Array
+(
+    [no_identificacion] => 1023861067
+    [contrasena] => abc.123
+)
+
+Método de solicitud: POST
+Conexión a la base de datos exitosa
+Identificación: '1023861067', Contraseña: 'abc.123'
+Usuario encontrado: Sí
+Autenticación exitosa. Perfil: Administrador
+Sesión iniciada: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Redirigiendo a perfiles/administrador/inicio_admin.php
+Contenido de $_POST: Array
+(
+    [no_identificacion] => 1023861067
+    [contrasena] => abc.123
+)
+
+Método de solicitud: POST
+Conexión a la base de datos exitosa
+Identificación: '1023861067', Contraseña: 'abc.123'
+Usuario encontrado: Sí
+Autenticación exitosa. Perfil: Administrador
+Sesión iniciada: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Redirigiendo a perfiles/administrador/inicio_admin.php
+Contenido de $_POST: Array
+(
+    [no_identificacion] => 1023861067
+    [contrasena] => abc.123
+)
+
+Método de solicitud: POST
+Conexión a la base de datos exitosa
+Identificación: '1023861067', Contraseña: 'abc.123'
+Usuario encontrado: Sí
+Autenticación exitosa. Perfil: Administrador
+Sesión iniciada: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Redirigiendo a perfiles/administrador/inicio_admin.php
+Contenido de $_POST: Array
+(
+    [no_identificacion] => 1023861067
+    [contrasena] => abc.123
+)
+
+Método de solicitud: POST
+Conexión a la base de datos exitosa
+Identificación: '1023861067', Contraseña: 'abc.123'
+Usuario encontrado: Sí
+Autenticación exitosa. Perfil: Administrador
+Sesión iniciada: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Redirigiendo a perfiles/administrador/inicio_admin.php

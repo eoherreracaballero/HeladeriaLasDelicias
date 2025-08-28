@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clientes API Productos</title>
+</head>
+<body>
+    <h1>Lista de Productos desde API</h1>
+    <ul id="lista-productos"><li>Cargando productos...</li></ul>
+
+    <script>
+        // URL de la API
+        const apiURL = 'http://localhost/heladeria/modulos/logistica/apis/api_productos.php';
+
+        // Función para obtener productos y mostrarlos
+        async function cargarProductos() {
+            try {
+                const respuesta = await fetch(apiURL);
+                if (!respuesta.ok) throw new Error('Error en la petición');
+
+                const data = await respuesta.json();
+                console.log('Datos recibidos:', data);
+
+                const productos = data.productos;  // Acceder al array dentro del objeto
+
+                const ul = document.getElementById('lista-productos');
+                ul.innerHTML = ''; // Limpiar texto "Cargando..."
+
+                if (!Array.isArray(productos)) {
+                    ul.textContent = 'Datos recibidos no son una lista.';
+                    return;
+                }
+
+                if (productos.length === 0) {
+                    ul.textContent = 'No hay productos para mostrar.';
+                    return;
+                }
+
+                productos.forEach(producto => {
+                    const li = document.createElement('li');
+                    li.textContent = `${producto.ID_Producto} - ${producto.Nombre_Producto}`;
+                    ul.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                const ul = document.getElementById('lista-productos');
+                ul.textContent = 'Error al cargar productos. Revisa la consola para más detalles.';
+            }
+        }
+
+        // Cargar productos al iniciar la página
+        cargarProductos();
+    </script>
+</body>
+</html>

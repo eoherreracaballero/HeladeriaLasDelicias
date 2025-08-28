@@ -1,0 +1,468 @@
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+)
+
+Sesión no encontrada, redirigiendo a /Heladeria/index.php?error=sesion_no_valida
+Sesión en encabezado.php: Array
+(
+)
+
+Sesión no encontrada, redirigiendo a /Heladeria/index.php?error=sesion_no_valida
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
+Sesión en encabezado.php: Array
+(
+    [no_identificacion] => 1023861067
+    [nombre] => Edward Herrera
+    [perfil] => Administrador
+    [perfil_id] => 1
+    [perfil_nombre] => Administracion
+)
+
