@@ -6,15 +6,15 @@ error_reporting(E_ALL);
 include(__DIR__ . "/../../../app/db/conexion.php");
 
 // Capturar datos del formulario
-$identificacion = $_POST['Identificacion'] ?? '';
-$nombre         = $_POST['nombre'] ?? '';
-$ciudad         = $_POST['ciudad'] ?? '';
-$direccion      = $_POST['direccion'] ?? '';
-$telefono       = $_POST['telefono'] ?? '';
-$cargo          = $_POST['cargo'] ?? '';
-$id_perfil      = $_POST['id_perfil'] ?? '';
-$email          = $_POST['email'] ?? '';
-$clave_plana    = $_POST['clave'] ?? '';
+$identificacion = trim($_POST['Identificacion'] ?? '');
+$nombre         = trim($_POST['nombre'] ?? '');
+$ciudad         = trim($_POST['ciudad'] ?? '');
+$direccion      = trim($_POST['direccion'] ?? '');
+$telefono       = trim($_POST['telefono'] ?? '');
+$cargo          = trim($_POST['cargo'] ?? '');
+$id_perfil      = trim($_POST['id_perfil'] ?? '');
+$email          = trim($_POST['email'] ?? '');
+$clave_plana    = trim($_POST['clave'] ?? '');
 
 // Validar campos requeridos
 if (
@@ -28,14 +28,14 @@ if (
     empty($email) || 
     empty($clave_plana)
 ) {
-    echo "<script>alert('Todos los campos son obligatorios.'); window.location.href='../usuarios.php';</script>";
+    header("Location: ../usuarios.php?error=campos");
     exit;
 }
 
 // Verificar si ya existe identificación o correo
-$sql_check = "SELECT * FROM usuario WHERE no_identificacion = ? OR email = ?";
+$sql_check = "SELECT id_usuario FROM usuario WHERE no_identificacion = ? OR email = ?";
 $stmt_check = $conexion->prepare($sql_check);
-$stmt_check->bind_param("is", $identificacion, $email);
+$stmt_check->bind_param("ss", $identificacion, $email); // ✅ corregido
 $stmt_check->execute();
 $result_check = $stmt_check->get_result();
 
@@ -56,7 +56,7 @@ $sql_insert = "INSERT INTO usuario
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt_insert = $conexion->prepare($sql_insert);
-$stmt_insert->bind_param("issssssss",
+$stmt_insert->bind_param("sssssssss",
     $identificacion,
     $nombre,
     $ciudad,
@@ -69,9 +69,11 @@ $stmt_insert->bind_param("issssssss",
 );
 
 if ($stmt_insert->execute()) {
-    header("Location: ../usuarios.php?mensaje=Usuario registrado con éxito");
+    header("Location: ../usuarios.php?success=1");
+    exit;
 } else {
-    echo "Error al registrar usuario: " . $stmt_insert->error;
+    header("Location: ../usuarios.php?error=insertar");
+    exit;
 }
 
 $stmt_insert->close();

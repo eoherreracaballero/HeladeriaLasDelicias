@@ -11,7 +11,9 @@ $res_prod = $conexion->query("
     SELECT u.*, p.nombre_perfil 
     FROM usuario u
     INNER JOIN perfiles p ON u.id_perfil = p.id_perfil
+    ORDER BY u.id_usuario ASC
 ");
+
 $num_reg = $res_prod->num_rows;
 
 // Traemos los perfiles para el <select>
@@ -27,26 +29,19 @@ require_once __DIR__ . "/../../public/html/tablas.php";
 ?>
 
 <main class="container-fluid p-4 fade-in" id="contenido">
-    <?php if (isset($_GET['error']) && $_GET['error'] == 'existe'): ?>
-        <div class="alert alert-danger">⚠️ Ya existe un usuario con esa identificación o correo electrónico.</div>
-    <?php elseif (isset($_GET['success']) && $_GET['success'] == 1): ?>
-        <div class="alert alert-success">✅ Usuario registrado correctamente.</div>
+    <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+    <div class="alert alert-success">✅ Usuario registrado correctamente.</div>
+<?php elseif (isset($_GET['error'])): ?>
+    <?php if ($_GET['error'] == "campos"): ?>
+        <div class="alert alert-danger">⚠️ Todos los campos son obligatorios.</div>
+    <?php elseif ($_GET['error'] == "existe"): ?>
+        <div class="alert alert-warning">⚠️ Ya existe un usuario con esa identificación o correo.</div>
+    <?php elseif ($_GET['error'] == "insertar"): ?>
+        <div class="alert alert-danger">❌ Ocurrió un error al registrar el usuario.</div>
     <?php endif; ?>
-    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
-        <div class="alert alert-success">✅ Usuario actualizado correctamente.</div>
-    <?php endif; ?>
-    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'deleted'): ?>
-        <div class="alert alert-warning">🗑️ Usuario eliminado correctamente.</div>
-    <?php endif; ?>
+<?php endif; ?>
 
     <h2 class="text-primary mb-4"><i class="fas fa-users-cog me-2"></i>Módulo de Gestión de Usuarios</h2>
-
-    <?php if (isset($_GET['msg'])): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        ✅ <?= htmlspecialchars($_GET['msg']) ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-    </div>
-<?php endif; ?>
 
     <form class="mb-4" method="POST" action="crud_usuario/guardar_usuario.php">
         <div class="row g-3">
