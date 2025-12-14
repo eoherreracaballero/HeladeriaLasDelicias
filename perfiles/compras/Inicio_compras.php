@@ -13,11 +13,11 @@ $perfilUsuario = $_SESSION['perfil_nombre'];
 // Ruta de imagen del usuario
 $imgPath = "../img/usuarios/" . $nombreUsuario . ".jpg";
 if (!file_exists($imgPath)) {
-    $imgPath = "../img/Usuarios/Caballero.jpg"; // Imagen genérica si no existe la personalizada
+    $imgPath = "../../public/img/Usuarios/Caballero.jpg"; // Imagen genérica si no existe la personalizada
 }
 
 // cargando el encabezado
-require_once __DIR__ . "/../html/encabezado.php";
+require_once __DIR__ . "/../../public/html/encabezado.php";
 ?>
 
 <div class="d-flex flex-column flex-md-row">

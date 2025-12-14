@@ -7,14 +7,30 @@ require_once __DIR__ . "/../../../public/html/encabezado.php";
 // Conexión de base de datos
 include(__DIR__ . "/../../../app/db/conexion.php");
 
-// Consulta los egresos con datos básicos y nombre del cliente
-$sql = "SELECT ip.Id_Egreso, ip.Tipo_Egreso, ip.Fecha_Egreso, ip.Subtotal_Egreso, 
-               ip.IVA_Egreso, ip.Total_Egreso, p.Nombre_Cliente
-        FROM egreso_producto ip
-        LEFT JOIN cliente p ON ip.Id_cliente = p.Id_cliente
-        ORDER BY ip.Id_Egreso DESC";
+// Consulta los egresos con datos básicos, nombre del cliente Y DESCUENTO
+$sql = "SELECT ip.Id_Egreso, ip.Tipo_Egreso, ip.Fecha_Egreso, 
+               ip.Subtotal_Egreso, ip.Descuento_Aplicado, 
+ip.IVA_Egreso, ip.Total_Egreso, p.Nombre_Cliente
+FROM egreso_producto ip
+LEFT JOIN cliente p ON ip.Id_cliente = p.Id_cliente
+ORDER BY ip.Id_Egreso DESC";$sql = "SELECT 
+    ip.Id_Egreso, 
+    ip.Tipo_Egreso, 
+    ip.Fecha_Egreso, 
+    ip.Subtotal_Egreso, 
+    ip.Descuento_Aplicado, 
+    ip.IVA_Egreso, 
+    ip.Total_Egreso, 
+    p.Nombre_Cliente
+FROM egreso_producto ip
+LEFT JOIN cliente p ON ip.Id_cliente = p.Id_cliente
+ORDER BY ip.Id_Egreso DESC";
 
 $resultado = $conexion->query($sql);
+if ($resultado === FALSE) {
+    // Manejo de errores de MySQL más robusto
+    die("❌ Error en la consulta SQL: " . $conexion->error);
+}
 ?>
 
 <main class="p-4 flex-grow-1 fade-in" id="contenido">
@@ -36,8 +52,8 @@ $resultado = $conexion->query($sql);
                     <th>Tipo de Egreso</th>
                     <th>Fecha Egreso</th>
                     <th>Cliente</th>
-                    <th>Subtotal</th>
-                    <th>IVA</th>
+                    <th>Subtotal Neto</th>
+                    <th>Descuento</th> <th>IVA</th>
                     <th>Total</th>
                     <th>Detalle</th>
                 </tr>
@@ -50,12 +66,12 @@ $resultado = $conexion->query($sql);
                         <td><?= htmlspecialchars($fila['Fecha_Egreso']) ?></td>
                         <td><?= htmlspecialchars($fila['Nombre_Cliente']) ?></td>
                         <td>$ <?= number_format($fila['Subtotal_Egreso'], 2) ?></td>
-                        <td>$ <?= number_format($fila['IVA_Egreso'], 2) ?></td>
+                        <td>$ <?= number_format($fila['Descuento_Aplicado'], 2) ?></td> <td>$ <?= number_format($fila['IVA_Egreso'], 2) ?></td>
                         <td>$ <?= number_format($fila['Total_Egreso'], 2) ?></td>
                         <td>
                             <a href="detalle_egreso.php?id=<?= urlencode($fila['Id_Egreso']) ?>" 
                                class="btn btn-info btn-sm">
-                               Ver Detalle
+                                Ver Detalle
                             </a>
                         </td>
                     </tr>

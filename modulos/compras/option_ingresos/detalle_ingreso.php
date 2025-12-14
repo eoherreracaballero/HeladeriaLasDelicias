@@ -51,8 +51,8 @@ $stmtDetalle->close();
     <div class="card shadow-lg border-0 rounded-3">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i> Detalle de Ingreso #<?= $idIngreso ?></h5>
-            <a href="../ingresos.php" class="btn btn-light btn-sm">
-                <i class="fas fa-arrow-left"></i> Volver
+            <a href="../anulaciones.php" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left"></i> Volver Anulaciones
             </a>
         </div>
         <div class="card-body">

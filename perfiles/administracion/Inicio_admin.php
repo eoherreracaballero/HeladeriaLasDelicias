@@ -5,6 +5,7 @@ require_once __DIR__ . "/../../app/config/acceso.php";
 // Permitir solo perfil Administrador (id_perfil = 1)
 verificar_perfil([1]);
 
+// Obtener datos del usuario desde sesión
 $nombreUsuario = $_SESSION['nombre']; 
 $perfilUsuario = $_SESSION['perfil_nombre']; 
 
@@ -13,9 +14,9 @@ $imgPath = "../img/usuarios/" . $nombreUsuario . ".jpg";
 if (!file_exists($imgPath)) {
     $imgPath = "../../public/img/Usuarios/Caballero.jpg"; // Imagen genérica si no existe
 }
-?>
 
-<?php require_once __DIR__ . "/../../public/html/encabezado.php"; ?>
+// cargando el encabezado
+require_once __DIR__ . "/../../public/html/encabezado.php"; ?>
 
 <div class="d-flex flex-column flex-md-row">
     <main class="p-4 flex-grow-1 fade-in" id="contenido">

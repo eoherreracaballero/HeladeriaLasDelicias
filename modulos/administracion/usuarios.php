@@ -2,49 +2,55 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// conexión y encabezado
-require_once __DIR__ . "/../../public/html/encabezado.php";
-include("../../app/db/conexion.php");
+// Rutas de Inclusión
+// CRÍTICO: Usamos __DIR__ para asegurar la ruta correcta desde /modulos/
+require_once __DIR__ . "/../../public/html/encabezado.php"; 
+include(__DIR__ . "/../../app/db/conexion.php");
+require_once __DIR__ . "/../../public/html/tablas.php"; 
 
-// Traemos usuarios con su perfil
-$res_prod = $conexion->query("
+global $conexion;
+
+// 1. Traemos usuarios con su perfil
+$sql_usuarios = "
     SELECT u.*, p.nombre_perfil 
     FROM usuario u
     INNER JOIN perfiles p ON u.id_perfil = p.id_perfil
     ORDER BY u.id_usuario ASC
-");
+";
 
-$num_reg = $res_prod->num_rows;
+$res_prod = $conexion->query($sql_usuarios);
+$num_reg = $res_prod ? $res_prod->num_rows : 0; // Manejar posible error de consulta
 
-// Traemos los perfiles para el <select>
+// 2. Traemos los perfiles para el formulario de registro
 $res_perfiles = $conexion->query("SELECT id_perfil, nombre_perfil FROM perfiles");
 
-if ($num_reg == 0) {
-    echo "No hay usuarios registrados";
-    mysqli_close($conexion);
-    exit();
-}
-// Estilos para tablas
-require_once __DIR__ . "/../../public/html/tablas.php";
 ?>
 
 <main class="container-fluid p-4 fade-in" id="contenido">
-    <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-    <div class="alert alert-success">✅ Usuario registrado correctamente.</div>
-<?php elseif (isset($_GET['error'])): ?>
-    <?php if ($_GET['error'] == "campos"): ?>
-        <div class="alert alert-danger">⚠️ Todos los campos son obligatorios.</div>
-    <?php elseif ($_GET['error'] == "existe"): ?>
-        <div class="alert alert-warning">⚠️ Ya existe un usuario con esa identificación o correo.</div>
-    <?php elseif ($_GET['error'] == "insertar"): ?>
-        <div class="alert alert-danger">❌ Ocurrió un error al registrar el usuario.</div>
+    
+    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ✅ Usuario actualizado con éxito.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    <?php elseif (isset($_GET['success']) && $_GET['success'] == 1): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ✅ Usuario registrado correctamente.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    <?php elseif (isset($_GET['error'])): ?>
+        <?php if ($_GET['error'] == "campos"): ?>
+            <div class="alert alert-danger">⚠️ Todos los campos son obligatorios.</div>
+        <?php elseif ($_GET['error'] == "existe"): ?>
+            <div class="alert alert-warning">⚠️ Ya existe un usuario con esa identificación o correo.</div>
+        <?php elseif ($_GET['error'] == "insertar"): ?>
+            <div class="alert alert-danger">❌ Ocurrió un error al registrar el usuario.</div>
+        <?php endif; ?>
     <?php endif; ?>
-<?php endif; ?>
-
     <h2 class="text-primary mb-4"><i class="fas fa-users-cog me-2"></i>Módulo de Gestión de Usuarios</h2>
 
     <form class="mb-4" method="POST" action="crud_usuario/guardar_usuario.php">
-        <div class="row g-3">
+        <div class="row g-3 border p-3 rounded shadow-sm">
             <div class="col-12 col-md-4">
                 <label for="Identificacion" class="form-label">No Identificación</label>
                 <input type="number" class="form-control" name="Identificacion" id="Identificacion" placeholder="Número de Identificación" required>
@@ -70,14 +76,20 @@ require_once __DIR__ . "/../../public/html/tablas.php";
                 <input type="text" class="form-control" name="cargo" id="cargo" placeholder="Cargo" required>
             </div>
 
-            <!-- Perfil dinámico -->
             <div class="col-12 col-md-4">
                 <label for="Perfil" class="form-label">Perfil</label>
                 <select class="form-select" name="id_perfil" id="Perfil" required>
                     <option value="">Seleccione un rol</option>
-                    <?php while ($perfil = $res_perfiles->fetch_assoc()) { ?>
+                    <?php 
+                    // CRÍTICO: El fetch de perfiles debe ser realizado de nuevo aquí si se usó fetch_assoc() antes. 
+                    // Usamos fetch_all en la parte superior para evitar este problema.
+                    if ($res_perfiles->num_rows > 0) {
+                        // Reseteamos el puntero de resultados si ya se usó fetch_assoc
+                        $res_perfiles->data_seek(0); 
+                    }
+                    while ($perfil = $res_perfiles->fetch_assoc()) { ?>
                         <option value="<?= $perfil['id_perfil'] ?>">
-                            <?= $perfil['nombre_perfil'] ?>
+                            <?= htmlspecialchars($perfil['nombre_perfil']) ?>
                         </option>
                     <?php } ?>
                 </select>
@@ -97,9 +109,10 @@ require_once __DIR__ . "/../../public/html/tablas.php";
         </div>
     </form>
 
-    <h4 class="text-secondary">Lista de Usuarios Registrados</h4>
+    <h4 class="text-secondary mt-5">Lista de Usuarios Registrados</h4>
+    <?php if ($num_reg > 0): ?>
     <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-3">
+        <table class="table table-bordered table-hover mt-3 tabla-datatable">
             <thead class="table-primary text-center">
                 <tr>
                     <th>ID</th>
@@ -117,21 +130,19 @@ require_once __DIR__ . "/../../public/html/tablas.php";
             <tbody>
                 <?php while ($fila = $res_prod->fetch_assoc()) { ?>
                     <tr>
-                        <td><?php echo $fila['id_usuario']; ?></td>
-                        <td><?php echo $fila['no_identificacion']; ?></td>
-                        <td><?php echo $fila['nombre']; ?></td>
-                        <td><?php echo $fila['ciudad']; ?></td>
-                        <td><?php echo $fila['direccion']; ?></td>
-                        <td><?php echo $fila['telefono']; ?></td>
-                        <td><?php echo $fila['cargo']; ?></td>
-                        <td><?php echo $fila['nombre_perfil']; ?></td>
-                        <td><?php echo $fila['email']; ?></td>
+                        <td><?= htmlspecialchars($fila['id_usuario']); ?></td>
+                        <td><?= htmlspecialchars($fila['no_identificacion']); ?></td>
+                        <td><?= htmlspecialchars($fila['nombre']); ?></td>
+                        <td><?= htmlspecialchars($fila['ciudad']); ?></td>
+                        <td><?= htmlspecialchars($fila['direccion']); ?></td>
+                        <td><?= htmlspecialchars($fila['telefono']); ?></td>
+                        <td><?= htmlspecialchars($fila['cargo']); ?></td>
+                        <td><?= htmlspecialchars($fila['nombre_perfil']); ?></td>
+                        <td><?= htmlspecialchars($fila['email']); ?></td>
                         <td class="text-center">
-                            <!-- Botón Editar -->
                             <a href="crud_usuario/editar_usuario.php?id=<?= $fila['id_usuario'] ?>" class="btn btn-sm btn-warning me-1 mb-1">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <!-- Botón Eliminar -->
                             <a href="crud_usuario/eliminar_usuario.php?id=<?= $fila['id_usuario'] ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('¿Estás seguro que deseas eliminar este usuario?');">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
@@ -141,19 +152,14 @@ require_once __DIR__ . "/../../public/html/tablas.php";
             </tbody>
         </table>
     </div>
+    <?php else: ?>
+        <div class="alert alert-info">No hay usuarios registrados.</div>
+    <?php endif; ?>
 </main>
 
 <script>
-    document.getElementById('searchGlobal')?.addEventListener('input', function () {
-        const text = this.value.toLowerCase();
-        document.querySelectorAll('#contenido *').forEach(el => {
-            if (el.textContent.toLowerCase().includes(text)) {
-                el.style.display = '';
-            } else if (el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE') {
-                el.style.display = 'none';
-            }
-        });
-    });
+    // Se elimina el script de búsqueda global, ya que se recomienda usar la librería de DataTables (cargada por tablas.php)
+    // o un script específico para buscar en la tabla, no en todo el contenido de la página.
 </script>
 
 <?php 

@@ -184,6 +184,7 @@ $rutaActual = $_SERVER['PHP_SELF'];
                 <li><a href="/Heladeria/modulos/logistica/bodegas.php" class="nav-link text-white <?= strpos($rutaActual, '/modulos/logistica/bodegas.php') !== false ? 'active-sub' : ''; ?>">Bodegas</a></li>
                 <li><a href="/Heladeria/modulos/logistica/ajustes.php" class="nav-link text-white <?= strpos($rutaActual, '/modulos/logistica/ajustes.php') !== false ? 'active-sub' : ''; ?>">Ajustes</a></li>
                 <li><a href="/Heladeria/modulos/logistica/reportes.php" class="nav-link text-white <?= strpos($rutaActual, '/modulos/logistica/reportes.php') !== false ? 'active-sub' : ''; ?>">Reportes</a></li>
+                <li><a href="/Heladeria/modulos/logistica/transferencia_bodegas.php" class="nav-link text-white <?= strpos($rutaActual, '/modulos/logistica/transferencia_bodegas.php') !== false ? 'active-sub' : ''; ?>">Transferencias</a></li>
             </ul>
         </li>
         <?php endif; ?>

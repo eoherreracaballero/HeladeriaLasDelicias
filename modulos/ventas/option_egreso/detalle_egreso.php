@@ -13,13 +13,13 @@ if ($idEgreso <= 0) {
     die("ID de egreso inválido.");
 }
 
-// Consulta cabecera del egreso con cliente
+// Consulta cabecera del egreso con cliente Y CMV (Costo de Mercancía Vendida)
 $sqlEgreso = "SELECT ep.Id_Egreso, ep.Tipo_Egreso, ep.Fecha_Egreso, 
                      ep.Subtotal_Egreso, ep.IVA_Egreso, ep.Total_Egreso, 
-                     c.Nombre_Cliente
-              FROM egreso_producto ep
-              JOIN cliente c ON ep.Id_cliente = c.Id_cliente
-              WHERE ep.Id_Egreso = ?";
+                     ep.Costo_Mercancia_Vendida, c.Nombre_Cliente
+             FROM egreso_producto ep
+             JOIN cliente c ON ep.Id_cliente = c.Id_cliente
+             WHERE ep.Id_Egreso = ?";
 $stmtEgreso = $conexion->prepare($sqlEgreso);
 $stmtEgreso->bind_param("i", $idEgreso);
 $stmtEgreso->execute();
@@ -31,12 +31,18 @@ if (!$egreso) {
     die("Egreso no encontrado.");
 }
 
-// Consulta detalle del egreso con producto y bodega
-$sqlDetalle = "SELECT d.ID_Producto, d.Cantidad, d.PVP, p.Nombre_Producto, b.Nombre_Bodega
-               FROM detalle_egreso d
-               JOIN producto p ON d.ID_Producto = p.ID_Producto
-               JOIN bodega b ON d.ID_Bodega = b.Id_Bodega
-               WHERE d.Id_Egreso = ?";
+// Cálculo de Utilidad Bruta Total
+$cmvTotal = floatval($egreso['Costo_Mercancia_Vendida'] ?? 0);
+$subtotalVenta = floatval($egreso['Subtotal_Egreso'] ?? 0);
+$utilidadBrutaTotal = $subtotalVenta - $cmvTotal;
+
+
+// Consulta detalle del egreso con producto, bodega y COSTO UNITARIO
+$sqlDetalle = "SELECT d.ID_Producto, d.Cantidad, d.PVP, d.Costo_Unitario, p.Nombre_Producto, b.Nombre_Bodega
+             FROM detalle_egreso d
+             JOIN producto p ON d.ID_Producto = p.ID_Producto
+             JOIN bodega b ON d.ID_Bodega = b.Id_Bodega
+             WHERE d.Id_Egreso = ?";
 $stmtDetalle = $conexion->prepare($sqlDetalle);
 $stmtDetalle->bind_param("i", $idEgreso);
 $stmtDetalle->execute();
@@ -64,11 +70,21 @@ $stmtDetalle->close();
 
             <hr>
 
-            <div class="row g-3 text-end">
-                <div class="col-md-4 offset-md-8">
-                    <p><span class="fw-bold">Subtotal:</span> <span class="badge bg-secondary">$<?= number_format($egreso['Subtotal_Egreso'], 2) ?></span></p>
+            <!-- Resumen Financiero -->
+            <div class="row g-3">
+                <!-- Totales de Venta -->
+                <div class="col-md-6 text-start border-end">
+                    <h6 class="fw-bold text-danger">Totales de Venta (Ingresos)</h6>
+                    <p><span class="fw-bold">Subtotal:</span> <span class="badge bg-secondary">$<?= number_format($subtotalVenta, 2) ?></span></p>
                     <p><span class="fw-bold">IVA (19%):</span> <span class="badge bg-warning text-dark">$<?= number_format($egreso['IVA_Egreso'], 2) ?></span></p>
-                    <p><span class="fw-bold">Total:</span> <span class="badge bg-danger">$<?= number_format($egreso['Total_Egreso'], 2) ?></span></p>
+                    <p><span class="fw-bold h5">Total Venta:</span> <span class="badge bg-danger h5">$<?= number_format($egreso['Total_Egreso'], 2) ?></span></p>
+                </div>
+
+                <!-- Totales de Costo y Utilidad -->
+                <div class="col-md-6 text-start">
+                    <h6 class="fw-bold text-success">Totales Contables (Costos)</h6>
+                    <p><span class="fw-bold">Costo Merc. Vendida (CMV):</span> <span class="badge bg-dark">$<?= number_format($cmvTotal, 2) ?></span></p>
+                    <p><span class="fw-bold h5">Utilidad Bruta:</span> <span class="badge bg-success h5">$<?= number_format($utilidadBrutaTotal, 2) ?></span></p>
                 </div>
             </div>
         </div>
@@ -77,34 +93,41 @@ $stmtDetalle->close();
     <!-- Detalle de Productos -->
     <div class="card shadow-lg border-0 rounded-3 mt-4">
         <div class="card-header bg-dark text-white">
-            <h6 class="mb-0"><i class="fas fa-boxes me-2"></i> Productos Egresados</h6>
+            <h6 class="mb-0"><i class="fas fa-boxes me-2"></i> Productos Egresados (Detalle por Ítem)</h6>
         </div>
         <div class="card-body">
             <?php if ($resultDetalle->num_rows > 0): ?>
             <div class="table-responsive">
                 <table class="table table-hover table-bordered align-middle text-center">
                     <thead class="table-danger">
-    <tr>
-        <th>ID Producto</th>
-        <th>Producto</th>
-        <th>Bodega</th>
-        <th>Cantidad</th>
-        <th>PVP</th>
-        <th>Precio Total</th>
-    </tr>
-</thead>
-<tbody>
-    <?php while ($fila = $resultDetalle->fetch_assoc()): ?>
-    <tr>
-        <td><?= htmlspecialchars($fila['ID_Producto']) ?></td>
-        <td><?= htmlspecialchars($fila['Nombre_Producto']) ?></td>
-        <td><?= htmlspecialchars($fila['Nombre_Bodega']) ?></td>
-        <td><?= number_format($fila['Cantidad'], 2) ?></td>
-        <td>$<?= number_format($fila['PVP'], 2) ?></td>
-        <td class="fw-bold text-danger">$<?= number_format($fila['Cantidad'] * $fila['PVP'], 2) ?></td>
-    </tr>
-    <?php endwhile; ?>
-</tbody>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Bodega</th>
+                            <th>Cantidad</th>
+                            <th>PVP Venta</th>
+                            <th class="bg-info text-white">Costo Unitario (CPP)</th>
+                            <th>Total Venta</th>
+                            <th class="bg-success text-white">Utilidad Bruta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        while ($fila = $resultDetalle->fetch_assoc()): 
+                            $costoTotalItem = $fila['Cantidad'] * $fila['Costo_Unitario'];
+                            $ventaTotalItem = $fila['Cantidad'] * $fila['PVP'];
+                            $utilidadItem = $ventaTotalItem - $costoTotalItem;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($fila['Nombre_Producto']) ?></td>
+                            <td><?= htmlspecialchars($fila['Nombre_Bodega']) ?></td>
+                            <td><?= number_format($fila['Cantidad'], 2) ?></td>
+                            <td>$<?= number_format($fila['PVP'], 2) ?></td>
+                            <td class="bg-light">$<?= number_format($fila['Costo_Unitario'], 2) ?></td>
+                            <td class="fw-bold text-danger">$<?= number_format($ventaTotalItem, 2) ?></td>
+                            <td class="fw-bold text-success">$<?= number_format($utilidadItem, 2) ?></td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
                 </table>
             </div>
             <?php else: ?>
