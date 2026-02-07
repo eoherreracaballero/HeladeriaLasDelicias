@@ -15,6 +15,7 @@ $sql_usuarios = "
     SELECT u.*, p.nombre_perfil 
     FROM usuario u
     INNER JOIN perfiles p ON u.id_perfil = p.id_perfil
+    WHERE u.Estado = 'Activo'  -- Filtro para ver solo activos
     ORDER BY u.id_usuario ASC
 ";
 
@@ -143,9 +144,12 @@ $res_perfiles = $conexion->query("SELECT id_perfil, nombre_perfil FROM perfiles"
                             <a href="crud_usuario/editar_usuario.php?id=<?= $fila['id_usuario'] ?>" class="btn btn-sm btn-warning me-1 mb-1">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="crud_usuario/eliminar_usuario.php?id=<?= $fila['id_usuario'] ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('¿Estás seguro que deseas eliminar este usuario?');">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
+                            <a href="crud_usuario/eliminar_usuario.php?id=<?= $fila['id_usuario'] ?>" 
+   class="btn btn-sm btn-secondary mb-1" 
+   onclick="return confirm('¿Estás seguro que deseas SUSPENDER a este usuario? Ya no podrá acceder al sistema.');"
+   title="Suspender Usuario">
+    <i class="fas fa-user-slash"></i>
+</a>
                         </td>
                     </tr>
                 <?php } ?>

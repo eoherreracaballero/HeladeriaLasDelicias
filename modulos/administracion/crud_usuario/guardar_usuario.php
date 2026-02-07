@@ -50,10 +50,9 @@ $stmt_check->close();
 // Encriptar la contraseña
 $clave_hash = password_hash($clave_plana, PASSWORD_DEFAULT);
 
-// Insertar nuevo usuario
 $sql_insert = "INSERT INTO usuario 
-    (no_identificacion, nombre, ciudad, direccion, telefono, cargo, id_perfil, email, contrasena) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    (no_identificacion, nombre, ciudad, direccion, telefono, cargo, id_perfil, email, contrasena, Estado) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Activo')";
 
 $stmt_insert = $conexion->prepare($sql_insert);
 $stmt_insert->bind_param("sssssssss",
@@ -66,6 +65,7 @@ $stmt_insert->bind_param("sssssssss",
     $id_perfil,
     $email,
     $clave_hash
+    $estado = 'Activo' // Agregado para asegurar que el nuevo usuario se registre como activo
 );
 
 if ($stmt_insert->execute()) {

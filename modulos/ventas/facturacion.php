@@ -81,7 +81,7 @@ $tiposEgreso = ['Factura', 'Ajuste'];
             <i class="fas fa-list"></i> Ver Egresos
         </a>
 
-        <a href="crud_cliente/crear_cliente.php" class="btn btn-success">
+        <a href="clientes.php" class="btn btn-success">
             <i class="fas fa-user-plus"></i> Crear Cliente
         </a>
     </div>
