@@ -3,170 +3,235 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Rutas de Inclusión
-// CRÍTICO: Usamos __DIR__ para asegurar la ruta correcta desde /modulos/
 require_once __DIR__ . "/../../public/html/encabezado.php"; 
 include(__DIR__ . "/../../app/db/conexion.php");
 require_once __DIR__ . "/../../public/html/tablas.php"; 
 
 global $conexion;
 
-// 1. Traemos usuarios con su perfil
-$sql_usuarios = "
-    SELECT u.*, p.nombre_perfil 
-    FROM usuario u
-    INNER JOIN perfiles p ON u.id_perfil = p.id_perfil
-    WHERE u.Estado = 'Activo'  -- Filtro para ver solo activos
-    ORDER BY u.id_usuario ASC
-";
+// 1. Consultas para las tablas
+$sql_activos = "SELECT u.*, p.nombre_perfil FROM usuario u INNER JOIN perfiles p ON u.id_perfil = p.id_perfil WHERE u.Estado = 'Activo' ORDER BY u.id_usuario ASC";
+$res_activos = $conexion->query($sql_activos);
 
-$res_prod = $conexion->query($sql_usuarios);
-$num_reg = $res_prod ? $res_prod->num_rows : 0; // Manejar posible error de consulta
+$sql_suspendidos = "SELECT u.*, p.nombre_perfil FROM usuario u INNER JOIN perfiles p ON u.id_perfil = p.id_perfil WHERE u.Estado = 'Suspendido' ORDER BY u.id_usuario ASC";
+$res_suspendidos = $conexion->query($sql_suspendidos);
 
-// 2. Traemos los perfiles para el formulario de registro
 $res_perfiles = $conexion->query("SELECT id_perfil, nombre_perfil FROM perfiles");
-
 ?>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <main class="container-fluid p-4 fade-in" id="contenido">
     
-    <?php if (isset($_GET['msg']) && $_GET['msg'] == 'updated'): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ✅ Usuario actualizado con éxito.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    <?php elseif (isset($_GET['success']) && $_GET['success'] == 1): ?>
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ✅ Usuario registrado correctamente.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    <?php elseif (isset($_GET['error'])): ?>
-        <?php if ($_GET['error'] == "campos"): ?>
-            <div class="alert alert-danger">⚠️ Todos los campos son obligatorios.</div>
-        <?php elseif ($_GET['error'] == "existe"): ?>
-            <div class="alert alert-warning">⚠️ Ya existe un usuario con esa identificación o correo.</div>
-        <?php elseif ($_GET['error'] == "insertar"): ?>
-            <div class="alert alert-danger">❌ Ocurrió un error al registrar el usuario.</div>
-        <?php endif; ?>
+    <?php if (isset($_GET['msg'])): ?>
+        <script>
+            const msgs = {
+                'updated': ['¡Actualizado!', 'Usuario modificado con éxito', 'success'],
+                'suspended': ['Suspendido', 'El acceso ha sido inhabilitado', 'warning'],
+                'reactivated': ['¡Activado!', 'El usuario puede ingresar de nuevo', 'success']
+            };
+            const m = msgs['<?= $_GET['msg'] ?>'];
+            if(m) Swal.fire(m[0], m[1], m[2]);
+        </script>
     <?php endif; ?>
-    <h2 class="text-primary mb-4"><i class="fas fa-users-cog me-2"></i>Módulo de Gestión de Usuarios</h2>
+    <?php if (isset($_GET['success'])): ?>
+        <script>Swal.fire('¡Registrado!', 'Nuevo usuario creado correctamente', 'success');</script>
+    <?php endif; ?>
 
-    <form class="mb-4" method="POST" action="crud_usuario/guardar_usuario.php">
-        <div class="row g-3 border p-3 rounded shadow-sm">
-            <div class="col-12 col-md-4">
-                <label for="Identificacion" class="form-label">No Identificación</label>
-                <input type="number" class="form-control" name="Identificacion" id="Identificacion" placeholder="Número de Identificación" required>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Nombre de usuario" required>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="ciudad" class="form-label">Ciudad</label>
-                <input type="text" class="form-control" name="ciudad" id="ciudad" placeholder="Ciudad de Ubicación" required>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="direccion" class="form-label">Dirección</label>
-                <input type="text" class="form-control" name="direccion" id="direccion" placeholder="Dirección" required>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <input type="number" class="form-control" name="telefono" id="telefono" placeholder="No. Tel o Celular" required>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="cargo" class="form-label">Cargo</label>
-                <input type="text" class="form-control" name="cargo" id="cargo" placeholder="Cargo" required>
-            </div>
+    <h2 class="text-primary mb-4"><i class="fas fa-users-cog me-2"></i>Gestión de Usuarios</h2>
 
-            <div class="col-12 col-md-4">
-                <label for="Perfil" class="form-label">Perfil</label>
-                <select class="form-select" name="id_perfil" id="Perfil" required>
-                    <option value="">Seleccione un rol</option>
-                    <?php 
-                    // CRÍTICO: El fetch de perfiles debe ser realizado de nuevo aquí si se usó fetch_assoc() antes. 
-                    // Usamos fetch_all en la parte superior para evitar este problema.
-                    if ($res_perfiles->num_rows > 0) {
-                        // Reseteamos el puntero de resultados si ya se usó fetch_assoc
-                        $res_perfiles->data_seek(0); 
-                    }
-                    while ($perfil = $res_perfiles->fetch_assoc()) { ?>
-                        <option value="<?= $perfil['id_perfil'] ?>">
-                            <?= htmlspecialchars($perfil['nombre_perfil']) ?>
-                        </option>
-                    <?php } ?>
-                </select>
-            </div>
-
-            <div class="col-12 col-md-4">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" class="form-control" name="email" id="email" placeholder="Correo electrónico" required>
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="clave" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" name="clave" id="clave" placeholder="Contraseña" required>
-            </div>
-            <div class="col-12 col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-success w-100"><i class="fas fa-save me-2"></i>Guardar Usuario</button>
-            </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Registrar Nuevo Personal</h5>
         </div>
-    </form>
-
-    <h4 class="text-secondary mt-5">Lista de Usuarios Registrados</h4>
-    <?php if ($num_reg > 0): ?>
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover mt-3 tabla-datatable">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th>ID</th>
-                    <th>Identificación</th>
-                    <th>Nombre</th>
-                    <th>Ciudad</th>
-                    <th>Dirección</th>
-                    <th>Teléfono</th>
-                    <th>Cargo</th>
-                    <th>Perfil</th>
-                    <th>Email</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($fila = $res_prod->fetch_assoc()) { ?>
-                    <tr>
-                        <td><?= htmlspecialchars($fila['id_usuario']); ?></td>
-                        <td><?= htmlspecialchars($fila['no_identificacion']); ?></td>
-                        <td><?= htmlspecialchars($fila['nombre']); ?></td>
-                        <td><?= htmlspecialchars($fila['ciudad']); ?></td>
-                        <td><?= htmlspecialchars($fila['direccion']); ?></td>
-                        <td><?= htmlspecialchars($fila['telefono']); ?></td>
-                        <td><?= htmlspecialchars($fila['cargo']); ?></td>
-                        <td><?= htmlspecialchars($fila['nombre_perfil']); ?></td>
-                        <td><?= htmlspecialchars($fila['email']); ?></td>
-                        <td class="text-center">
-                            <a href="crud_usuario/editar_usuario.php?id=<?= $fila['id_usuario'] ?>" class="btn btn-sm btn-warning me-1 mb-1">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <a href="crud_usuario/eliminar_usuario.php?id=<?= $fila['id_usuario'] ?>" 
-   class="btn btn-sm btn-secondary mb-1" 
-   onclick="return confirm('¿Estás seguro que deseas SUSPENDER a este usuario? Ya no podrá acceder al sistema.');"
-   title="Suspender Usuario">
-    <i class="fas fa-user-slash"></i>
-</a>
-                        </td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+        <div class="card-body">
+            <form method="POST" action="crud_usuario/guardar_usuario.php">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">No. Identificación</label>
+                        <input type="number" class="form-control" name="Identificacion" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" name="nombre" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" name="ciudad" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" name="direccion" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="number" class="form-control" name="telefono" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Cargo</label>
+                        <input type="text" class="form-control" name="cargo" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Perfil / Rol</label>
+                        <select class="form-select" name="id_perfil" required>
+                            <option value="">Seleccione...</option>
+                            <?php while ($p = $res_perfiles->fetch_assoc()): ?>
+                                <option value="<?= $p['id_perfil'] ?>"><?= $p['nombre_perfil'] ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Contraseña inicial</label>
+                        <input type="password" class="form-control" name="clave" required>
+                    </div>
+                    <div class="col-md-9 d-flex align-items-end justify-content-end">
+                        <button type="submit" class="btn btn-success px-4"><i class="fas fa-save me-2"></i>Guardar Usuario</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-    <?php else: ?>
-        <div class="alert alert-info">No hay usuarios registrados.</div>
-    <?php endif; ?>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-user-check me-2"></i>Personal Activo</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover tabla-datatable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Cargo</th>
+                            <th>Perfil</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($fila = $res_activos->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= $fila['id_usuario'] ?></td>
+                                <td><strong><?= htmlspecialchars($fila['nombre']) ?></strong></td>
+                                <td><?= htmlspecialchars($fila['cargo']) ?></td>
+                                <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($fila['nombre_perfil']) ?></span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-info text-white" onclick='verDetalles(<?= json_encode($fila) ?>)' title="Ver Detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="crud_usuario/editar_usuario.php?id=<?= $fila['id_usuario'] ?>" class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="confirmarSuspension(<?= $fila['id_usuario'] ?>, '<?= $fila['nombre'] ?>')" title="Suspender">
+                                        <i class="fas fa-user-slash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0 text-danger"><i class="fas fa-user-lock me-2"></i>Acceso Restringido (Suspendidos)</h5>
+        </div>
+        <div class="card-body bg-light">
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Cargo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($res_suspendidos->num_rows > 0): ?>
+                            <?php while ($sus = $res_suspendidos->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= $sus['id_usuario'] ?></td>
+                                    <td class="text-muted"><?= htmlspecialchars($sus['nombre']) ?></td>
+                                    <td><?= htmlspecialchars($sus['cargo']) ?></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info text-white" onclick='verDetalles(<?= json_encode($sus) ?>)'>
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-success" onclick="confirmarReactivacion(<?= $sus['id_usuario'] ?>)">
+                                            <i class="fas fa-user-plus me-1"></i> Reactivar
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr><td colspan="4" class="text-center text-muted">No hay cuentas suspendidas.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </main>
 
+<div class="modal fade" id="modalDetalles" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Información del Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalleContenido">
+                </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Se elimina el script de búsqueda global, ya que se recomienda usar la librería de DataTables (cargada por tablas.php)
-    // o un script específico para buscar en la tabla, no en todo el contenido de la página.
+function verDetalles(u) {
+    const html = `
+        <div class="list-group list-group-flush">
+            <div class="list-group-item"><strong>Identificación:</strong> <span class="float-end">${u.no_identificacion}</span></div>
+            <div class="list-group-item"><strong>Nombre:</strong> <span class="float-end">${u.nombre}</span></div>
+            <div class="list-group-item"><strong>Email:</strong> <span class="float-end text-primary">${u.email}</span></div>
+            <div class="list-group-item"><strong>Teléfono:</strong> <span class="float-end">${u.telefono}</span></div>
+            <div class="list-group-item"><strong>Ciudad:</strong> <span class="float-end">${u.ciudad}</span></div>
+            <div class="list-group-item"><strong>Dirección:</strong> <span class="float-end text-truncate" style="max-width: 200px;">${u.direccion}</span></div>
+            <div class="list-group-item"><strong>Cargo:</strong> <span class="float-end">${u.cargo}</span></div>
+            <div class="list-group-item"><strong>Perfil:</strong> <span class="badge bg-secondary float-end">${u.nombre_perfil}</span></div>
+            <div class="list-group-item"><strong>Estado:</strong> <span class="badge ${u.Estado == 'Activo' ? 'bg-success' : 'bg-danger'} float-end">${u.Estado}</span></div>
+        </div>`;
+    document.getElementById('detalleContenido').innerHTML = html;
+    new bootstrap.Modal(document.getElementById('modalDetalles')).show();
+}
+
+function confirmarSuspension(id, nombre) {
+    Swal.fire({
+        title: '¿Suspender a ' + nombre + '?',
+        text: "Perderá acceso al sistema inmediatamente.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Sí, suspender',
+        cancelButtonText: 'Cancelar'
+    }).then((r) => { if (r.isConfirmed) window.location.href = 'crud_usuario/eliminar_usuario.php?id=' + id; });
+}
+
+function confirmarReactivacion(id) {
+    Swal.fire({
+        title: '¿Reactivar acceso?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        confirmButtonText: 'Sí, reactivar'
+    }).then((r) => { if (r.isConfirmed) window.location.href = 'crud_usuario/reactivar_usuario.php?id=' + id; });
+}
 </script>
 
-<?php 
-mysqli_close($conexion);
-ob_end_flush();
-?>
+<?php mysqli_close($conexion); ?>

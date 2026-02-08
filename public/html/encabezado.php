@@ -220,6 +220,7 @@ logoutBtn?.addEventListener('click', function(e) {
         window.location.href = this.href; // Redirige si confirma
     }
 });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </script>
 
     
