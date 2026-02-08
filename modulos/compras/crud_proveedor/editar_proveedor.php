@@ -1,105 +1,103 @@
 <?php
-ob_start();
-
-// Conexión a la base de datos
+// 1. PROCESAMIENTO DE DATOS PRIMERO 
 include(__DIR__ . "/../../../app/db/conexion.php");
 
-// incluir encabezado.php para cargar estilos y scripts
-require_once __DIR__ . "/../../../public/html/encabezado.php";
-
-// Estilos para tablas
-require_once __DIR__ . "/../../../public/html/tablas.php";
-
-// Validar y obtener el ID del proveedor desde la URL
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Consultar proveedor por ID
-$consulta = "SELECT * FROM proveedor WHERE ID_Proveedor = $id";
-$resultado = mysqli_query($conexion, $consulta);
-
-// Verificar si se encontró el proveedor
-if (!$resultado || mysqli_num_rows($resultado) === 0) {
-    echo "<div class='alert alert-danger'>⚠️ Proveedor no encontrado.</div>";
-    exit();
-}
-
-// Obtener datos del proveedor
-$proveedor = mysqli_fetch_assoc($resultado);
-
-// Si se envió el formulario con método POST, actualizar proveedor
+// Si se envió el formulario, procesamos la actualización
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $nit       = $_POST['Identificacion'];
-    $nombre    = $_POST['nombre'];
-    $ciudad    = $_POST['ciudad'];
-    $direccion = $_POST['Direccion'];
-    $telefono  = $_POST['telefono'];
-    $asesor    = $_POST['asesor'];
-    $productos = $_POST['productos'];
+    $nit       = $_POST['nit'];
+    $nom       = $_POST['nombre'];
+    $ciu       = $_POST['ciudad'];
+    $dir       = $_POST['direccion'];
+    $tel       = $_POST['telefono'];
+    $ase       = $_POST['asesor'];
+    $pro       = $_POST['productos'];
 
     $sql_update = "UPDATE proveedor SET 
         No_NIT = '$nit',
-        Nombre_Proveedor = '$nombre',
-        Ciudad = '$ciudad',
-        Direccion = '$direccion',
-        Tel_Contacto = '$telefono',
-        Asesor_Contacto = '$asesor',
-        Productos_Venta = '$productos'
+        Nombre_Proveedor = '$nom',
+        Ciudad = '$ciu',
+        Direccion = '$dir',
+        Tel_Contacto = '$tel',
+        Asesor_Contacto = '$ase',
+        Productos_Venta = '$pro'
         WHERE ID_Proveedor = $id";
 
     if (mysqli_query($conexion, $sql_update)) {
+        // Ahora el header funcionará porque no hay HTML enviado aún
         header("Location: ../proveedores.php?msg=updated");
         exit();
     } else {
-        echo "<div class='alert alert-danger'>❌ Error al actualizar: " . mysqli_error($conexion) . "</div>";
+        $error_db = mysqli_error($conexion);
     }
-} 
+}
+
+// 2. CARGA DE INTERFAZ DESPUÉS
+require_once __DIR__ . "/../../../public/html/encabezado.php";
+require_once __DIR__ . "/../../../public/html/tablas.php";
+
+// Consultar datos actuales para mostrar en los inputs
+$res = $conexion->query("SELECT * FROM proveedor WHERE ID_Proveedor = $id");
+$p = $res->fetch_assoc();
+
+if (!$p) {
+    echo "<div class='alert alert-danger m-4'>⚠️ Proveedor no encontrado.</div>";
+    exit();
+}
 ?>
 
 <main class="container p-4">
-    <h2 class="text-primary mb-4"><i class="fas fa-edit me-2"></i>Editar Proveedor</h2>
-    <form method="POST">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label for="Identificacion" class="form-label">No. NIT</label>
-                <input type="number" class="form-control" name="Identificacion" id="Identificacion"
-                       value="<?= $proveedor['No_NIT'] ?>" required>
-            </div>
-            <div class="col-md-4">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" name="nombre" id="nombre"
-                       value="<?= $proveedor['Nombre_Proveedor'] ?>" required>
-            </div>
-            <div class="col-md-4">
-                <label for="ciudad" class="form-label">Ciudad</label>
-                <input type="text" class="form-control" name="ciudad" id="ciudad"
-                       value="<?= $proveedor['Ciudad'] ?>" required>
-            </div>
-            <div class="col-md-4">
-                <label for="Direccion" class="form-label">Dirección</label>
-                <input type="text" class="form-control" name="Direccion" id="Direccion"
-                       value="<?= $proveedor['Direccion'] ?>" required>
-            </div>
-            <div class="col-md-4">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <input type="text" class="form-control" name="telefono" id="telefono"
-                       value="<?= $proveedor['Tel_Contacto'] ?>" required>
-            </div>
-            <div class="col-md-4">
-                <label for="asesor" class="form-label">Asesor</label>
-                <input type="text" class="form-control" name="asesor" id="asesor"
-                       value="<?= $proveedor['Asesor_Contacto'] ?>" required>
-            </div>
-            <div class="col-md-8">
-                <label for="productos" class="form-label">Productos</label>
-                <input type="text" class="form-control" name="productos" id="productos"
-                       value="<?= $proveedor['Productos_Venta'] ?>" required>
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-save me-2"></i>Guardar Cambios
-                </button>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <?php if(isset($error_db)): ?>
+                <div class="alert alert-danger">❌ Error: <?= $error_db ?></div>
+            <?php endif; ?>
+
+            <div class="card shadow border-warning">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    <i class="fas fa-edit me-2"></i>Editar Ficha del Proveedor
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">NIT</label>
+                                <input type="number" class="form-control" name="nit" value="<?= $p['No_NIT'] ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre / Razón Social</label>
+                                <input type="text" class="form-control" name="nombre" value="<?= $p['Nombre_Proveedor'] ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" name="ciudad" value="<?= $p['Ciudad'] ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" name="telefono" value="<?= $p['Tel_Contacto'] ?>" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Dirección</label>
+                                <input type="text" class="form-control" name="direccion" value="<?= $p['Direccion'] ?>" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label text-primary fw-bold">Asesor de Contacto</label>
+                                <input type="text" class="form-control" name="asesor" value="<?= $p['Asesor_Contacto'] ?>" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Productos que distribuye</label>
+                                <textarea class="form-control" name="productos" rows="2" required><?= $p['Productos_Venta'] ?></textarea>
+                            </div>
+                            <div class="col-12 d-flex justify-content-between mt-4">
+                                <a href="../proveedores.php" class="btn btn-secondary px-4">Cancelar</a>
+                                <button type="submit" class="btn btn-warning px-4 fw-bold">Actualizar Datos</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </form>
+    </div>
 </main>
 <?php mysqli_close($conexion); ?>

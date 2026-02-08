@@ -1,231 +1,161 @@
-    <?php
-    ob_start();
+<?php
+ob_start();
+session_start();
+include(__DIR__ . "/../../../app/db/conexion.php");
 
-    // incluir encabezado.php para cargar estilos y scripts
-    require_once __DIR__ . "/../../../public/html/encabezado.php";
+// --- PROCESAR ACTUALIZACIÓN ---
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Recogemos los datos asegurándonos de que coincidan con los 'name' del formulario
+    $id = intval($_POST['id']);
+    $nombre = $_POST['nombre'];
+    $pvp = $_POST['pvp'];
+    $costo = $_POST['costo_unitario'];
+    $tipo = $_POST['tipo']; // Antes podía estar faltando en el HTML
+    $categoria = $_POST['categoria'];
+    $empaque = $_POST['und_empaque'];
+    $marca = $_POST['marca'];
+    $proveedor = intval($_POST['proveedor']); // Aseguramos que sea entero para la FK
+    $bodega = intval($_POST['bodega']);
 
-    // Conexión a la base de datos
-    include(__DIR__ . "/../../../app/db/conexion.php");
+    $update_img = "";
+    if (isset($_FILES['imagen_producto']) && $_FILES['imagen_producto']['error'] == 0) {
+        $nombre_img = "prod_" . time() . ".jpg";
+        $ruta_fisica = "../../../public/img/productos/" . $nombre_img;
+        if (move_uploaded_file($_FILES['imagen_producto']['tmp_name'], $ruta_fisica)) {
+            $ruta_db = "public/img/productos/" . $nombre_img;
+            $update_img = ", Ruta_Imagen = '$ruta_db'";
+        }
+    }
 
-    // Estilos para tablas
-    require_once __DIR__ . "/../../../public/html/tablas.php";
+    // Consulta SQL robusta
+    $sql = "UPDATE producto SET 
+            Nombre_Producto = '$nombre', 
+            PVP = '$pvp', 
+            Costo_Unitario = '$costo',
+            Tipo = '$tipo', 
+            Categoria = '$categoria', 
+            Und_Empaque = '$empaque',
+            Marca = '$marca', 
+            ID_Proveedor = '$proveedor', 
+            ID_Bodega = '$bodega' 
+            $update_img 
+            WHERE ID_Producto = $id";
 
-    global $conexion;
-
-    // Ruta base para la carpeta de imágenes subidas (usada por PHP para mover archivos)
-    $RUTA_BASE_UPLOADS = "/../../../public/img/productos/";
-
-    // 1. VALIDAR Y OBTENER ID
-    $id = isset($_GET['ID_Producto']) ? intval($_GET['ID_Producto']) : 0;
-
-    // Consulta inicial para cargar datos del producto
-    $stmt_select = $conexion->prepare("SELECT * FROM producto WHERE ID_Producto = ?");
-    $stmt_select->bind_param("i", $id);
-    $stmt_select->execute();
-    $res = $stmt_select->get_result();
-
-    if (!$res || $res->num_rows == 0) {
-        echo "<div class='alert alert-danger m-4'>❌ Producto no encontrado.</div>";
+    if ($conexion->query($sql)) {
+        header("Location: ../productos.php?msg=updated");
         exit();
+    } else {
+        $error_db = "Error en base de datos: " . $conexion->error;
     }
-    $producto = $res->fetch_assoc();
-    $stmt_select->close();
+}
 
+// --- MOSTRAR FORMULARIO ---
+require_once __DIR__ . "/../../../public/html/encabezado.php";
+$id = intval($_GET['ID_Producto'] ?? $_GET['id']);
+$res = $conexion->query("SELECT * FROM producto WHERE ID_Producto = $id");
+$p = $res->fetch_assoc();
 
-    // 2. GUARDAR CAMBIOS (POST)
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        
-        // Recibir y sanear variables
-        $nombre = trim($_POST['nombre']);
-        $tipo = trim($_POST['tipo']);
-        $categoria = trim($_POST['categoria']);
-        $und_empaque = trim($_POST['und_empaque']);
-        $pvp = floatval($_POST['pvp']);
-        $estado = trim($_POST['estado']);
-        $bodega = intval($_POST['bodega']);
-        $marca = trim($_POST['marca']);
-        
-        // 3. PROCESAMIENTO DE IMAGEN (Solo si se sube una nueva)
-        $actualizarImagen = false;
-        $rutaImagenDB = '';
+// Cargar listas para los selects
+$bodegas = $conexion->query("SELECT Id_Bodega, Nombre_Bodega FROM bodega");
+$proveedores = $conexion->query("SELECT ID_Proveedor, Nombre_Proveedor FROM proveedor");
+?>
 
-        if (isset($_FILES['imagen_producto']) && $_FILES['imagen_producto']['error'] === UPLOAD_ERR_OK) {
-            $imagen = $_FILES['imagen_producto'];
-            $extension = strtolower(pathinfo($imagen['name'], PATHINFO_EXTENSION));
-            $nuevoNombre = uniqid('prod_', true) . '.' . $extension;
-            
-            $carpetaDestino = __DIR__ . $RUTA_BASE_UPLOADS;
-            // Ruta que se guardará en la DB (Ej: public/img/productos/...)
-            $rutaImagenDB = "public/img/productos/" . $nuevoNombre;
-            
-            $permitidos = ['jpg', 'jpeg', 'png'];
-            if (in_array($extension, $permitidos) && $imagen['size'] < 5000000) { // Límite de 5MB
-                if (move_uploaded_file($imagen['tmp_name'], $carpetaDestino . $nuevoNombre)) {
-                    $actualizarImagen = true;
-                    
-                    // CRÍTICO: Eliminar la imagen antigua del servidor si existe
-                    if (!empty($producto['Ruta_Imagen'])) {
-                        $rutaAntigua = __DIR__ . "/../../../" . $producto['Ruta_Imagen'];
-                        if (file_exists($rutaAntigua)) {
-                            unlink($rutaAntigua); // Elimina el archivo físico
-                        }
-                    }
-                } else {
-                    error_log("Fallo al mover archivo de imagen a: " . $carpetaDestino);
-                }
-            }
-        }
+<main class="container p-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <?php if(isset($error_db)): ?>
+                <div class="alert alert-danger"><?= $error_db ?></div>
+            <?php endif; ?>
 
-        // 4. CONSTRUCCIÓN DEL SQL DE UPDATE (Sentencia Preparada)
-        $sql = "UPDATE producto SET 
-            Nombre_Producto = ?,
-            Tipo = ?,
-            Categoria = ?,
-            Und_Empaque = ?,
-            PVP = ?,
-            Estado = ?,
-            ID_Bodega = ?,
-            Marca = ?";
-        
-        // Parámetros base: s, s, s, s, d, s, i, s
-        $tipos = "ssssdsis";
-        // Lista de valores que se enlazarán
-        $parametros = [$nombre, $tipo, $categoria, $und_empaque, $pvp, $estado, $bodega, $marca];
-        
-        // Si la imagen se actualizó, añadir Ruta_Imagen a la sentencia y a los parámetros
-        if ($actualizarImagen) {
-            $sql .= ", Ruta_Imagen = ?";
-            $tipos .= "s";
-            $parametros[] = $rutaImagenDB;
-        }
-        
-        // Cláusula WHERE y ID final
-        $sql .= " WHERE ID_Producto = ?";
-        $tipos .= "i";
-        $parametros[] = $id;
-
-        // 5. EJECUCIÓN DEL UPDATE PREPARADO
-        $stmt = $conexion->prepare($sql);
-        
-        // Usamos call_user_func_array para manejar el número dinámico de parámetros de bind_param
-        array_unshift($parametros, $tipos); // Pone el string de tipos al inicio del array de parámetros
-        
-        call_user_func_array([$stmt, 'bind_param'], $parametros);
-
-        if ($stmt->execute()) {
-            header("Location: ../productos.php?msg=Producto Actualizado con éxito"); // Dos niveles atrás para ir a productos.php
-            exit();
-        } else {
-            echo "<div class='alert alert-danger m-4'>❌ Error al actualizar: " . $stmt->error . "</div>";
-        }
-        $stmt->close();
-    }
-
-    // 6. FORMULARIO HTML
-    ?>
-
-    <main class="container p-4">
-        <h2 class="text-primary mb-4">✏️ Editar Producto: <?= htmlspecialchars($producto['Nombre_Producto']) ?></h2>
-        
-        <form method="POST" enctype="multipart/form-data"> 
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($producto['Nombre_Producto']) ?>" required>
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-pen-square me-2"></i>Edición Técnica: <?= htmlspecialchars($p['Nombre_Producto']) ?></h5>
+                    <span class="badge bg-dark">ID: #<?= $p['ID_Producto'] ?></span>
                 </div>
-                
-                <div class="col-md-4">
-                    <label for="tipo" class="form-label">Tipo</label>
-                    <input type="text" name="tipo" class="form-control" value="<?= htmlspecialchars($producto['Tipo']) ?>" required>
-                </div>
-
-                <div class="col-md-4">
-                    <label for="categoria" class="form-label">Categoría</label>
-                    <input type="text" name="categoria" class="form-control" value="<?= htmlspecialchars($producto['Categoria']) ?>" required>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="und_empaque" class="form-label">Und. Empaque</label>
-                    <select name="und_empaque" class="form-select" required>
-                        <?php
-                        $enumQuery = $conexion->query("SHOW COLUMNS FROM producto LIKE 'Und_Empaque'");
-                        $enumRow = $enumQuery->fetch_assoc();
-                        preg_match("/^enum\('(.*)'\)$/", $enumRow['Type'], $matches);
-                        $enumValues = explode("','", $matches[1]);
+                <div class="card-body">
+                    <form action="editar_producto.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="<?= $p['ID_Producto'] ?>">
                         
-                        foreach ($enumValues as $valor) {
-                            $selected = ($producto['Und_Empaque'] === $valor) ? "selected" : "";
-                            echo "<option value='$valor' $selected>$valor</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="pvp" class="form-label">PVP</label>
-                    <input type="number" step="0.01" name="pvp" class="form-control" value="<?= htmlspecialchars($producto['PVP']) ?>" required>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="estado" class="form-label">Estado</label>
-                    <input type="text" name="estado" class="form-control" value="<?= htmlspecialchars($producto['Estado']) ?>" required>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="bodega" class="form-label">ID Bodega</label>
-                    <input type="text" name="bodega" class="form-control" value="<?= htmlspecialchars($producto['ID_Bodega']) ?>" required>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="marca" class="form-label">Marca</label>
-                    <input type="text" name="marca" class="form-control" value="<?= htmlspecialchars($producto['Marca']) ?>" required>
-                </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Nombre del Producto</label>
+                                <input type="text" class="form-control" name="nombre" value="<?= $p['Nombre_Producto'] ?>" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Marca</label>
+                                <input type="text" class="form-control" name="marca" value="<?= $p['Marca'] ?>" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Tipo</label>
+                                <select class="form-select" name="tipo" required>
+                                    <option value="Mercancia" <?= $p['Tipo'] == 'Mercancia' ? 'selected' : '' ?>>Mercancía</option>
+                                    <option value="Insumos" <?= $p['Tipo'] == 'Insumos' ? 'selected' : '' ?>>Insumos</option>
+                                </select>
+                            </div>
 
-                <div class="col-md-6">
-                    <label for="imagen_producto" class="form-label">Cargar Nueva Imagen (Opcional)</label>
-                    <input type="file" class="form-control" id="imagen_producto" name="imagen_producto" accept="image/jpeg, image/png">
-                </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Categoría</label>
+                                <select class="form-select" name="categoria">
+                                    <option value="Helados" <?= $p['Categoria'] == 'Helados' ? 'selected' : '' ?>>Helados</option>
+                                    <option value="Lacteos" <?= $p['Lacteos'] == 'Lacteos' ? 'selected' : '' ?>>Lácteos</option>
+                                    <option value="Yogurt" <?= $p['Categoria'] == 'Yogurt' ? 'selected' : '' ?>>Yogurt</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Proveedor</label>
+                                <select class="form-select" name="proveedor" required>
+                                    <?php while($prov = $proveedores->fetch_assoc()): ?>
+                                        <option value="<?= $prov['ID_Proveedor'] ?>" <?= $p['ID_Proveedor'] == $prov['ID_Proveedor'] ? 'selected' : '' ?>>
+                                            <?= $prov['Nombre_Proveedor'] ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Bodega Principal</label>
+                                <select class="form-select" name="bodega" required>
+                                    <?php while($bod = $bodegas->fetch_assoc()): ?>
+                                        <option value="<?= $bod['Id_Bodega'] ?>" <?= $p['ID_Bodega'] == $bod['Id_Bodega'] ? 'selected' : '' ?>>
+                                            <?= $bod['Nombre_Bodega'] ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Imagen Actual</label><br>
-                    <?php 
-                    // CORRECCIÓN CLAVE: RUTA RELATIVA AL NAVEGADOR
-                    $rutaImagenDB = $producto['Ruta_Imagen'] ?? '';
-                    $imagenActualSrc = !empty($rutaImagenDB) 
-                        ? "../../../" . $rutaImagenDB // TRES NIVELES (../../../)
-                        : "../../../public/img/default-product.png"; // TRES NIVELES (../../../)
-                    ?>
-                    <img id="imagen_preview_edit" src="<?= htmlspecialchars($imagenActualSrc) ?>" 
-                        alt="Actual" style="max-width: 150px; height: auto; border: 1px solid #ccc; border-radius: 5px;">
-                </div>
-                
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-success w-100">
-                        <i class="fas fa-save me-2"></i>Guardar Cambios
-                    </button>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Costo Unitario</label>
+                                <input type="number" step="0.01" class="form-control" name="costo_unitario" value="<?= $p['Costo_Unitario'] ?>" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">PVP (Venta)</label>
+                                <input type="number" step="0.01" class="form-control" name="pvp" value="<?= $p['PVP'] ?>" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Empaque</label>
+                                <select class="form-select" name="und_empaque">
+                                    <option value="Unidad" <?= $p['Und_Empaque'] == 'Unidad' ? 'selected' : '' ?>>Unidad</option>
+                                    <option value="x10" <?= $p['Und_Empaque'] == 'x10' ? 'selected' : '' ?>>Pack x10</option>
+                                    <option value="x12" <?= $p['Und_Empaque'] == 'x12' ? 'selected' : '' ?>>Pack x12</option>
+                                    <option value="x24" <?= $p['Und_Empaque'] == 'x24' ? 'selected' : '' ?>>Pack x24</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Imagen del Producto</label>
+                                <input type="file" class="form-control" name="imagen_producto" id="edit_img">
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <img id="img_preview" src="../../<?= $p['Ruta_Imagen'] ?: 'public/img/default-product.png' ?>" class="rounded border shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-end">
+                            <a href="../productos.php" class="btn btn-secondary px-4 me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-warning px-5 fw-bold">Actualizar Información</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
-    </main>
-
-    <script>
-    // Script de previsualización para la edición
-    document.getElementById('imagen_producto').addEventListener('change', function(event) {
-        const preview = document.getElementById('imagen_preview_edit');
-        const file = event.target.files[0];
-        
-        // Si se selecciona un archivo, muestra la previsualización
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        } 
-    });
-    </script>
-
-    <?php 
-    mysqli_close($conexion);
-    ob_end_flush();
-    ?>
+        </div>
+    </div>
+</main>

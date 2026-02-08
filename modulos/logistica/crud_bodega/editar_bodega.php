@@ -1,94 +1,59 @@
 <?php
 ob_start();
-
-// incluir encabezado.php para cargar estilos y scripts
 require_once __DIR__ . "/../../../public/html/encabezado.php";
-
-// Conexión a la base de datos
 include(__DIR__ . "/../../../app/db/conexion.php");
 
-// Estilos para tablas
-require_once __DIR__ . "/../../../public/html/tablas.php";
-
-/* 1️⃣ Validar que llegue el ID */
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-
-$stmt = $conexion->prepare("SELECT * FROM bodega WHERE Id_Bodega = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$res = $stmt->get_result();
-
-if (!$res || $res->num_rows === 0) {
-    echo "<div class='alert alert-danger'>❌ Bodega no encontrada.</div>";
-    exit();
-}
-
+$res = $conexion->query("SELECT * FROM bodega WHERE Id_Bodega = $id");
 $bodega = $res->fetch_assoc();
-$stmt->close();
 
-/* 2️⃣ Procesar actualización */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $nombre    = trim($_POST['nombre']);
-    $ubicacion = trim($_POST['ubicacion']);
-    $estado    = trim($_POST['estado']);
+    $nombre    = $_POST['nombre'];
+    $ubicacion = $_POST['ubicacion'];
+    $estado    = $_POST['estado'];
 
-    if ($nombre === '' || $ubicacion === '' || $estado === '') {
-        echo "<div class='alert alert-danger'>❌ Todos los campos son obligatorios.</div>";
-    } else {
-        $sql = "UPDATE bodega 
-                SET Nombre_Bodega = ?, Ubicacion = ?, Estado = ? 
-                WHERE Id_Bodega = ?";
+    $upd = $conexion->prepare("UPDATE bodega SET Nombre_Bodega=?, Ubicacion=?, Estado=? WHERE Id_Bodega=?");
+    $upd->bind_param("sssi", $nombre, $ubicacion, $estado, $id);
 
-        $upd = $conexion->prepare($sql);
-        $upd->bind_param("sssi", $nombre, $ubicacion, $estado, $id);
-
-        if ($upd->execute()) {
-            header("Location: ../bodegas.php?mensaje=editado");
-            exit();
-        } else {
-            echo "<div class='alert alert-danger'>❌ Error al actualizar: " . $upd->error . "</div>";
-        }
-        $upd->close();
+    if ($upd->execute()) {
+        header("Location: ../bodegas.php?mensaje=editado");
+        exit();
     }
 }
 ?>
 
 <main class="container p-4">
-    <h2 class="mb-4 text-primary">✏️ Editar Bodega</h2>
-    <form method="POST">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Nombre de la Bodega</label>
-                <input type="text" name="nombre" class="form-control"
-                       value="<?= htmlspecialchars($bodega['Nombre_Bodega']) ?>" required>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Ubicación</label>
-                <input type="text" name="ubicacion" class="form-control"
-                       value="<?= htmlspecialchars($bodega['Ubicacion']) ?>" required>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Estado</label>
-                <select name="estado" class="form-select" required>
-                    <option value="Disponible" <?= $bodega['Estado'] === 'Disponible' ? 'selected' : '' ?>>Activa</option>
-                    <option value="Temporal" <?= $bodega['Estado'] === 'Temporal' ? 'selected' : '' ?>>Inactiva</option>
-                    <option value="No Conforme" <?= $bodega['Estado'] === 'No Conforme' ? 'selected' : '' ?>>Mantenimiento</option>
-                </select>
-            </div>
-
-            <div class="col-md-4 d-flex align-items-end">
-                <button class="btn btn-primary w-100">
-                    <i class="fas fa-save me-2"></i>Guardar Cambios
-                </button>
-            </div>
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Editar Bodega: <?= htmlspecialchars($bodega['Nombre_Bodega']) ?></h5>
         </div>
-    </form>
+        <div class="card-body bg-light">
+            <form method="POST">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($bodega['Nombre_Bodega']) ?>" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Ubicación</label>
+                        <input type="text" name="ubicacion" class="form-control" value="<?= htmlspecialchars($bodega['Ubicacion']) ?>" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Estado</label>
+                        <select name="estado" class="form-select" required>
+                            <option value="Disponible" <?= $bodega['Estado']=='Disponible'?'selected':'' ?>>Disponible</option>
+                            <option value="No Conforme" <?= $bodega['Estado']=='No Conforme'?'selected':'' ?>>Mantenimiento</option>
+                            <option value="Inactiva" <?= $bodega['Estado']=='Inactiva'?'selected':'' ?>>Inactiva (Suspender)</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-end border-top pt-3 mt-4">
+                        <a href="../bodegas.php" class="btn btn-secondary shadow-sm me-2">Cancelar</a>
+                        <button class="btn btn-primary shadow-sm px-4">Guardar Cambios</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </main>
 
-<?php
-mysqli_close($conexion);
-ob_end_flush();
-?>
-
+<?php ob_end_flush(); ?>

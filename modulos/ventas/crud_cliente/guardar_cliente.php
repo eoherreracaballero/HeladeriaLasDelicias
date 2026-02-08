@@ -1,46 +1,32 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// Conexión a la base de datos
 include(__DIR__ . "/../../../app/db/conexion.php");
 
-if (
-    isset($_POST['Identificacion']) &&
-    isset($_POST['nombre']) &&
-    isset($_POST['direccion']) &&
-    isset($_POST['telefono']) &&
-    isset($_POST['correo']) 
-) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // 1. Captura de datos y limpieza básica
+    $identificacion = mysqli_real_escape_string($conexion, $_POST['Identificacion']);
+    $nombre         = mysqli_real_escape_string($conexion, $_POST['nombre']);
+    $correo         = mysqli_real_escape_string($conexion, $_POST['correo']);
+    $ciudad         = mysqli_real_escape_string($conexion, $_POST['ciudad']);
+    $direccion      = mysqli_real_escape_string($conexion, $_POST['direccion']);
+    $telefono       = mysqli_real_escape_string($conexion, $_POST['telefono']);
+    
+    // El estado por defecto siempre será 'Activo' al registrar
+    $estado         = "Activo";
 
-    // Capturar datos del formulario
-    $identificacion = trim($_POST['Identificacion']);
-    $nombre = trim($_POST['nombre']);
-    $direccion = trim($_POST['direccion']);
-    $telefono = trim($_POST['telefono']);
-    $correo = trim($_POST['correo']);
+    // 2. Preparar la consulta SQL
+    // Asegúrate de que los nombres de las columnas coincidan EXACTAMENTE con tu tabla SQL
+    $sql = "INSERT INTO cliente (No_NIT, Nombre_Cliente, Email, Ciudad, Direccion, No_Telefono, Estado) 
+            VALUES ('$identificacion', '$nombre', '$correo', '$ciudad', '$direccion', '$telefono', '$estado')";
 
-    // Preparar consulta con nombres de campos correctos
-    $stmt = $conexion->prepare("INSERT INTO cliente (No_NIT, Nombre_Cliente, Direccion, No_Telefono, Email) VALUES (?, ?, ?, ?, ?)");
-
-    if (!$stmt) {
-        die("Error en la preparación de la consulta: " . $conexion->error);
-    }
-
-    $stmt->bind_param("sssss", $identificacion, $nombre, $direccion, $telefono, $correo);
-
-    if ($stmt->execute()) {
-        header("Location: ../clientes.php?msg=Cliente agregado con éxito");
-        exit();
+    // 3. Ejecutar y redireccionar
+    if ($conexion->query($sql)) {
+        // Redirige con éxito
+        header("Location: ../clientes.php?success=1");
     } else {
-        echo "<div class='alert alert-danger'>❌ Error al guardar el cliente: " . $stmt->error . "</div>";
+        // En caso de error, muestra qué pasó (puedes quitar esto en producción)
+        echo "Error al guardar: " . $conexion->error;
     }
-
-    $stmt->close();
-} else {
-    echo "<div class='alert alert-warning'>⚠️ Por favor, completa todos los campos del formulario.</div>";
 }
 
 mysqli_close($conexion);
 ?>
-
