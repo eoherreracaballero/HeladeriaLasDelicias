@@ -1,69 +1,51 @@
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
-    }
-
-    h1 {margin-top: 20px;}
-
-    a {
-        text-decoration: none;
-        color: #0066cc;
-        font-weight: bold;
+    /* Contenedor para dar redondeado a la tabla */
+    .table-responsive {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: white;
+        padding: 0;
+        margin: 20px auto;
+        width: 98%;
     }
 
     table {
+        width: 100%;
         border-collapse: collapse;
-        width: 95%;
-        margin: 20px auto;
-        background-color: #ffffff;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin: 0 !important; /* Reseteamos margen para el contenedor */
     }
 
-    th, td {
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #ddd;
-    }
-
+    /* TITULOS DE COLUMNAS - AJUSTE DE VISIBILIDAD */
     th {
-        background-color: #007BFF;
-        color: white;
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    .btn {
-        padding: 5px 10px;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .btn-delete {
-        background-color: #dc3545;
-    }
-
-    .btn-edit {
-        background-color: #28a745;
-    }
-
-    .btn:hover {
-        opacity: 0.85;
-    }
-
-    .top-links {
+        background-color: #1a237e !important; /* Azul Profundo Institucional */
+        color: #ffffff !important;           /* Texto Blanco Puro */
+        padding: 15px 10px !important;
         text-align: center;
-        margin-top: 10px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: none !important;
+        letter-spacing: 0.5px;
+    }
+
+    /* Filas de la tabla */
+    td {
+        padding: 12px 10px;
+        text-align: center;
+        border-bottom: 1px solid #edf2f7;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+
+    /* Efecto Hover para filas */
+    tr:hover td {
+        background-color: #f8faff !important;
+        color: #1a237e;
+        transition: 0.2s;
+    }
+
+    /* Alternancia de colores (Zebra) */
+    tr:nth-child(even) {
+        background-color: #fcfcfc;
     }
 </style>

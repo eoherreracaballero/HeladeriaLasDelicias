@@ -67,21 +67,61 @@ $rutaActual = $_SERVER['PHP_SELF'];
 <link rel="stylesheet" href="../../app/css/styles.css">
 </head>
 <body>
-<header class="text-white p-2 d-flex flex-wrap justify-content-between align-items-center" style="background-color: rgb(73, 98, 255);">
-    <div class="d-flex align-items-center mb-2 mb-md-0">
-        <button class="btn btn-light d-md-none me-2" id="toggleMenu"><i class="fas fa-bars"></i></button>
-        <img src="../../public/img/logo.png" width="60" height="60" class="me-2">
-        <span class="fs-5 fw-bold">El Palacio de las Delicias</span>
-    </div>
-    <div class="flex-grow-1 ms-md-3">
-        <input type="text" id="searchGlobal" class="form-control busqueda-input" placeholder="Buscar en la página...">
-    </div>
-        <div class="d-flex align-items-center ms-3">
-        <span class="me-3 text-white"><?= htmlspecialchars($nombreUsuario) ?></span>
-            <a href="/Heladeria/app/config/logout.php" id="logoutBtn" class="btn btn-danger btn-sm">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </a>    
+<header class="text-white shadow-sm d-flex flex-wrap justify-content-between align-items-center" 
+        style="background: linear-gradient(90deg, #1a237e 0%, #4962ff 100%); padding: 0.6rem 1.5rem;">
+    
+    <div class="d-flex align-items-center">
+        <button class="btn btn-link text-white d-md-none me-2" id="toggleMenu">
+            <i class="fas fa-bars fs-4"></i>
+        </button>
+        
+        <div class="bg-white rounded-circle p-1 me-3 shadow-sm">
+            <img src="../../public/img/logo.png" width="45" height="45" alt="Logo">
         </div>
+        
+        <div class="brand-text">
+            <h1 class="fs-5 fw-bold mb-0">El Palacio de las Delicias</h1>
+            <small class="opacity-75" style="font-size: 0.7rem; letter-spacing: 1px;">SISTEMA DE GESTIÓN ERP</small>
+        </div>
+    </div>
+
+    <div class="flex-grow-1 mx-lg-5 mx-3 d-none d-md-block">
+        <div class="input-group input-group-sm" style="max-width: 500px;">
+            <span class="input-group-text bg-white border-0 text-primary">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" id="searchGlobal" class="form-control border-0" placeholder="Buscar módulos, productos o folios..." style="box-shadow: none;">
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center">
+        <div class="text-end me-3 d-none d-sm-block">
+            <div class="fw-bold small"><?= htmlspecialchars($nombreUsuario) ?></div>
+            <span class="badge bg-warning text-dark" style="font-size: 0.6rem;"><?= strtoupper($perfil_nombre) ?></span>
+        </div>
+        
+        <div class="dropdown">
+            <button class="btn btn-link p-0 text-white text-decoration-none" data-bs-toggle="dropdown">
+                <div class="rounded-circle border border-2 border-white d-flex align-items-center justify-content-center bg-primary" 
+                     style="width: 40px; height: 40px; font-weight: bold;">
+                    <?= substr($nombreUsuario, 0, 1) ?>
+                </div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                <li class="p-3 text-center border-bottom bg-light">
+                    <i class="fas fa-user-circle fa-2x text-primary mb-2"></i>
+                    <div class="fw-bold small"><?= $nombreUsuario ?></div>
+                </li>
+                <li><a class="dropdown-item py-2" href="#"><i class="fas fa-key me-2 text-muted"></i> Cambiar Clave</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a href="/Heladeria/app/config/logout.php" id="logoutBtn" class="dropdown-item py-2 text-danger fw-bold">
+                        <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </header>
 
 <div class="main-container d-flex flex-column flex-md-row">

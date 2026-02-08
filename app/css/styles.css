@@ -1,97 +1,56 @@
-/* Evitar scroll horizontal */
-body { 
-  overflow-x: hidden; 
+/* Paleta de Azules Palacio de las Delicias */
+:root {
+    --azul-oscuro: #1a237e;
+    --azul-medio: #4962ff;
+    --azul-claro: #e8ebff;
+    --amarillo-detalles: #ffc107;
 }
 
-/* Sidebar */
-nav, #sidebar { 
-  min-width: 230px;
-  width: 230px;
-  transition: all 0.3s ease;
+body {
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Sidebar responsive */
-@media (max-width: 767.98px) {
-  #sidebar {
-    position: fixed;
-    top: 0;
-    left: -250px; /* oculto por defecto */
-    height: 100vh;
-    z-index: 1050;
-    background-color: #040cff; /* fondo consistente */
-  }
-
-  #sidebar.active {
-    left: 0; /* visible */
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
+/* Sidebar Azul Profundo */
+#sidebar {
+    background-color: var(--azul-oscuro) !important;
+    border-right: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Header */
-header { 
-  background-color: #14ec87; 
+#sidebar .nav-link {
+    color: rgba(255,255,255,0.8) !important;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 0;
+    transition: all 0.3s;
 }
 
-header > div {
-  margin-bottom: 10px;
+#sidebar .nav-link:hover {
+    color: #fff !important;
+    background-color: rgba(255,255,255,0.1);
 }
 
-/* Input búsqueda global */
-.busqueda-input { 
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Animación de entrada */
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Menú hover */
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transition: background-color 0.2s ease;
-}
-
-/* Flecha giratoria al expandir submenú */
-.nav-link[aria-expanded="true"] .fa-chevron-down,
-.transition-arrow.rotate {
-  transform: rotate(180deg);
-  transition: transform 0.3s ease;
-}
-
-/* Módulo principal activo */
+/* Marcar módulo activo con tu amarillo institucional */
 .active-main {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-left: 4px solid #ffc107;
-  font-weight: 600;
-  transition: all 0.3s ease;
+    background-color: rgba(255,255,255,0.15) !important;
+    border-left: 5px solid var(--amarillo-detalles) !important;
+    color: #fff !important;
 }
 
-/* Submenú activo */
 .active-sub {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid #ffc107;
-  font-weight: 500;
+    color: var(--amarillo-detalles) !important;
+    font-weight: bold;
 }
 
-/* Ajuste de enlaces dentro de submenú */
-#sidebar .nav-item .nav-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
+/* Transición para las flechas del menú */
+.transition-arrow {
+    transition: transform 0.3s;
+}
+.rotate {
+    transform: rotate(180deg);
 }
 
-/* Transiciones suaves para submenús */
-.collapse {
-  transition: height 0.3s ease;
-}
+/* Ajuste de scrollbar para que sea azul */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: var(--azul-medio); border-radius: 10px; }
