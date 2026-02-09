@@ -1,56 +1,97 @@
-/* Paleta de Azules Palacio de las Delicias */
 :root {
-    --azul-oscuro: #1a237e;
-    --azul-medio: #4962ff;
-    --azul-claro: #e8ebff;
-    --amarillo-detalles: #ffc107;
+    --azul-principal: #2c3e50;
+    --azul-institucional: #4962ff;
+    --sidebar-width: 260px;
+    --bg-gris: #f4f7f6;
 }
 
-body {
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+body { 
+    background-color: var(--bg-gris);
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
 }
 
-/* Sidebar Azul Profundo */
-#sidebar {
-    background-color: var(--azul-oscuro) !important;
-    border-right: 1px solid rgba(255,255,255,0.1);
+/* Sidebar Moderno (Desktop por defecto) */
+#sidebar { 
+    min-width: var(--sidebar-width);
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, #1a237e 0%, #4962ff 100%);
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #sidebar .nav-link {
-    color: rgba(255,255,255,0.8) !important;
-    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    margin: 4px 10px;
+    padding: 10px 15px;
     font-size: 0.9rem;
-    border-radius: 0;
-    transition: all 0.3s;
+    opacity: 0.85;
+    transition: all 0.2s;
+    color: white !important; /* Aseguramos visibilidad del texto */
 }
 
 #sidebar .nav-link:hover {
-    color: #fff !important;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.15);
+    opacity: 1;
+    transform: translateX(5px);
 }
 
-/* Marcar módulo activo con tu amarillo institucional */
-.active-main {
-    background-color: rgba(255,255,255,0.15) !important;
-    border-left: 5px solid var(--amarillo-detalles) !important;
-    color: #fff !important;
+#sidebar .active-main, #sidebar .active {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-left: 4px solid #ffc107 !important;
+    font-weight: 600;
+    opacity: 1;
 }
 
-.active-sub {
-    color: var(--amarillo-detalles) !important;
-    font-weight: bold;
+/* --- ESTO ES LO QUE FALTA PARA EL CELULAR --- */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed; /* Cambia de sticky a fixed para flotar sobre el contenido */
+        left: -260px;    /* Se oculta a la izquierda */
+        top: 0;
+        z-index: 1050;   /* Se pone por encima de todo */
+        height: 100vh;
+    }
+
+    /* Cuando el JS añade la clase 'active', el menú entra a la pantalla */
+    #sidebar.active {
+        left: 0 !important;
+    }
 }
 
-/* Transición para las flechas del menú */
-.transition-arrow {
-    transition: transform 0.3s;
-}
-.rotate {
-    transform: rotate(180deg);
+/* Header Estilo Dashboard */
+header { 
+    background-color: white !important;
+    color: var(--azul-principal) !important;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.5rem 1.5rem !important;
 }
 
-/* Ajuste de scrollbar para que sea azul */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: var(--azul-medio); border-radius: 10px; }
+header span, header .fw-bold {
+    color: var(--azul-principal) !important;
+}
+
+.busqueda-input {
+    background-color: #f0f2f5;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}

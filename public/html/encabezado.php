@@ -236,31 +236,21 @@ $rutaActual = $_SERVER['PHP_SELF'];
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const toggleMenu = document.getElementById('toggleMenu');
-const sidebar = document.getElementById('sidebar');
+    const toggleMenu = document.getElementById('toggleMenu');
+    const sidebar = document.getElementById('sidebar');
 
-toggleMenu.addEventListener('click', () => sidebar.classList.toggle('active'));
-sidebar.querySelectorAll('a.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-        if(window.innerWidth < 768) sidebar.classList.remove('active');
-    });
-});
-document.getElementById('searchGlobal')?.addEventListener('input', function() {
-    const text = this.value.toLowerCase();
-    document.querySelectorAll('#contenido *').forEach(el => {
-        if(el.textContent.toLowerCase().includes(text)) el.style.display = '';
-        else if(!['SCRIPT','STYLE'].includes(el.tagName)) el.style.display = 'none';
-    });
-});
-// Confirmación antes de cerrar sesión
-const logoutBtn = document.getElementById('logoutBtn');
-logoutBtn?.addEventListener('click', function(e) {
-    e.preventDefault(); // Evita la redirección automática
-    if (confirm("⚠️ ¿Estás seguro que deseas cerrar sesión?")) {
-        window.location.href = this.href; // Redirige si confirma
+    if (toggleMenu) {
+        toggleMenu.addEventListener('click', function(e) {
+            e.preventDefault();
+            sidebar.classList.toggle('active');
+        });
     }
-});
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</script>
 
-    
+    // Confirmación de cierre de sesión
+    document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+        if (!confirm("⚠️ ¿Estás seguro que deseas cerrar sesión?")) {
+            e.preventDefault();
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -4,3 +4,4 @@
         <i class="fas fa-code-branch me-1"></i> ADSO 2377388 - SENA
     </p>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
